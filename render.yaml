@@ -1,0 +1,22 @@
+# Render Blueprint — deploy PrescribeMe API (backend only)
+# Docs: https://render.com/docs/blueprint-spec
+# Connect this repo in Render and add OPENAI_API_KEY in the dashboard.
+
+services:
+  - type: web
+    name: prescribeme-api
+    runtime: python
+    region: oregon
+
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+        # Set in Render dashboard to your Vercel URL, e.g. https://prescribeme.vercel.app
+
+    # Chroma data is ephemeral on free tier; users can re-run "Initialize knowledge base" after restarts.
+    # For persistent storage, use a paid disk or an external vector DB (e.g. Pinecone).

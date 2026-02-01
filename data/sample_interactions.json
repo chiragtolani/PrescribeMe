@@ -1,0 +1,92 @@
+[
+  {
+    "drug_a": "Warfarin",
+    "drug_b": "Aspirin",
+    "risk": "high",
+    "summary": "Warfarin and aspirin both increase bleeding risk. Concomitant use significantly raises the risk of gastrointestinal and intracranial hemorrhage. Use with caution; consider gastroprotection.",
+    "evidence": "Multiple studies show additive antiplatelet/anticoagulant effects. FDA labeling recommends caution. Consider PPI for GI protection.",
+    "alternatives": "If antiplatelet needed: clopidogrel monotherapy after risk-benefit discussion. For pain: acetaminophen preferred when anticoagulated.",
+    "confidence": "high"
+  },
+  {
+    "drug_a": "Warfarin",
+    "drug_b": "Ibuprofen",
+    "risk": "moderate",
+    "summary": "NSAIDs like ibuprofen can increase warfarin effect and bleeding risk. Also GI ulcer risk.",
+    "evidence": "NSAIDs inhibit platelet function and may displace warfarin from protein binding. Short-term use may be acceptable with monitoring.",
+    "alternatives": "Acetaminophen for pain/fever. If NSAID required: use lowest dose, shortest duration, consider PPI, monitor INR closely.",
+    "confidence": "high"
+  },
+  {
+    "drug_a": "Lisinopril",
+    "drug_b": "Potassium",
+    "risk": "moderate",
+    "summary": "ACE inhibitors like lisinopril can cause potassium retention; adding potassium supplements or potassium-sparing diuretics increases hyperkalemia risk.",
+    "evidence": "ACE inhibitors reduce aldosterone; risk is dose-dependent and higher in renal impairment. Monitor potassium routinely.",
+    "alternatives": "Use potassium only when documented deficiency. Consider dietary sources. Avoid potassium-sparing diuretics unless needed.",
+    "confidence": "high"
+  },
+  {
+    "drug_a": "Metformin",
+    "drug_b": "Contrast dye",
+    "risk": "moderate",
+    "summary": "IV contrast can worsen metformin-associated lactic acidosis risk in renal impairment. Metformin is renally cleared.",
+    "evidence": "Guidelines recommend holding metformin before and after contrast in at-risk patients; restart when renal function is rechecked.",
+    "alternatives": "Hold metformin 48h before and after contrast if eGFR <60; recheck creatinine before restarting.",
+    "confidence": "high"
+  },
+  {
+    "drug_a": "Fluoxetine",
+    "drug_b": "Tramadol",
+    "risk": "high",
+    "summary": "SSRIs like fluoxetine inhibit CYP2D6; tramadol relies on 2D6 for active metabolite. Risk of serotonin syndrome and reduced analgesia.",
+    "evidence": "Serotonin syndrome cases reported. Tramadol efficacy may be reduced. FDA advises caution with serotonergic drugs.",
+    "alternatives": "Consider non-opioid analgesia. If opioid needed: morphine or oxycodone (not tramadol). Monitor for serotonin syndrome.",
+    "confidence": "high"
+  },
+  {
+    "drug_a": "Amoxicillin",
+    "drug_b": "Methotrexate",
+    "risk": "moderate",
+    "summary": "Penicillins can reduce renal clearance of methotrexate, increasing toxicity (myelosuppression, mucositis).",
+    "evidence": "Mechanism: competition for renal tubular secretion. Case reports and pharmacokinetic data support interaction.",
+    "alternatives": "Monitor methotrexate levels and CBC if both required. Consider timing or alternative antibiotic when feasible.",
+    "confidence": "high"
+  },
+  {
+    "drug_a": "Omeprazole",
+    "drug_b": "Clopidogrel",
+    "risk": "moderate",
+    "summary": "Omeprazole (CYP2C19 inhibitor) may reduce activation of clopidogrel and theoretically reduce antiplatelet effect.",
+    "evidence": "Data conflicting; some studies show reduced efficacy, others do not. Pantoprazole has less 2C19 inhibition.",
+    "alternatives": "Pantoprazole or H2 blocker (famotidine) preferred if PPI needed with clopidogrel. Or use PPI only when GI risk justifies.",
+    "confidence": "moderate"
+  },
+  {
+    "drug_a": "Simvastatin",
+    "drug_b": "Amiodarone",
+    "risk": "high",
+    "summary": "Amiodarone inhibits CYP3A4; simvastatin is a 3A4 substrate. Concomitant use increases myopathy and rhabdomyolysis risk.",
+    "evidence": "FDA limits simvastatin to 20 mg daily when used with amiodarone. Higher doses contraindicated.",
+    "alternatives": "Use pravastatin, rosuvastatin, or fluvastatin; or limit simvastatin to 20 mg. Monitor CK if symptoms.",
+    "confidence": "high"
+  },
+  {
+    "drug_a": "Digoxin",
+    "drug_b": "Amiodarone",
+    "risk": "moderate",
+    "summary": "Amiodarone increases digoxin levels (reduced clearance and possibly absorption). Risk of digoxin toxicity.",
+    "evidence": "Well-documented interaction. Reduce digoxin dose by ~50% when adding amiodarone; monitor levels.",
+    "alternatives": "Reduce digoxin dose and monitor serum levels and clinical signs of toxicity.",
+    "confidence": "high"
+  },
+  {
+    "drug_a": "Levothyroxine",
+    "drug_b": "Calcium carbonate",
+    "risk": "moderate",
+    "summary": "Calcium can bind levothyroxine in the gut and reduce absorption. Separate dosing by at least 4 hours.",
+    "evidence": "Multiple studies show reduced T4 absorption when taken together. Separation restores bioavailability.",
+    "alternatives": "Take levothyroxine on empty stomach; take calcium at least 4 hours later. Recheck TSH if regimen changes.",
+    "confidence": "high"
+  }
+]

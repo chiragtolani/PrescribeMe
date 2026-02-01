@@ -1,0 +1,33 @@
+# Environment
+.venv/
+venv/
+env/
+.env
+.env.local
+frontend/.env.local
+
+# Chroma
+chroma_db/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

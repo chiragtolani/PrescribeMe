@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --medical-teal: #0d9488;
+  --medical-teal-light: #ccfbf1;
+  --card: #ffffff;
+  --card-border: #e2e8f0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f172a;
+    --foreground: #f1f5f9;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+}
+
+/* Medical-themed background: subtle grid + gradient */
+.bg-medical-pattern {
+  background-color: #f0fdfa;
+  background-image:
+    linear-gradient(to right, rgba(13, 148, 136, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(13, 148, 136, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.bg-medical-mesh {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(45, 212, 191, 0.15), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(14, 165, 233, 0.08), transparent),
+    radial-gradient(ellipse 50% 30% at 0% 100%, rgba(20, 184, 166, 0.1), transparent);
+}
+
+/* Risk badges */
+.risk-high {
+  @apply bg-red-50 text-red-700 border border-red-200;
+}
+.risk-moderate {
+  @apply bg-amber-50 text-amber-800 border border-amber-200;
+}
+.risk-low {
+  @apply bg-emerald-50 text-emerald-700 border border-emerald-200;
+}
+.risk-contraindicated {
+  @apply bg-red-100 text-red-800 border border-red-300 font-semibold;
+}
+
+/* Smooth scroll and focus */
+* {
+  scroll-behavior: smooth;
+}
+
+*:focus-visible {
+  @apply outline-none ring-2 ring-medical-500 ring-offset-2;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 rounded;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded hover:bg-slate-400;
+}
