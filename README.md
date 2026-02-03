@@ -23,9 +23,9 @@ PrescribeMe is an intelligent AI-driven prescription review system designed to i
 | **API**         | **FastAPI** (CORS for frontend)     |
 | Backend / RAG   | **Python** (Retrieval-Augmented Generation) |
 | Embeddings      | **OpenAI text-embedding-3-small**    |
-| Vector store    | **Chroma** (or Pinecone)             |
+| Vector store    | **Chroma** (local or cloud) or Pinecone |
 | LLM             | **OpenAI** (e.g. gpt-4o-mini)        |
-| Data sources    | DrugBank-style interaction data (sample data included) |
+| Data sources    | Sample interactions (in repo) + **DrugBank** + **PubMed** (see [KB setup](docs/KB_AND_CHROMA.md)) |
 
 *(Optional: Streamlit UI via `streamlit run app.py`.)*
 
@@ -93,6 +93,8 @@ To get a **hosted URL**:
 
 See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for step-by-step instructions and env details.
 
+**Note:** For production (Vercel/Render), use **Chroma Cloud** (set `CHROMA_HOST` + `CHROMA_API_KEY`) instead of local Chroma. See **[docs/CHROMA_CLOUD_SETUP.md](./docs/CHROMA_CLOUD_SETUP.md)**.
+
 ---
 
 ## Project structure
@@ -112,7 +114,10 @@ PrescribeMe/
 │   ├── chroma_store.py
 │   ├── retrieval.py
 │   ├── llm.py
-│   └── rag.py
+│   ├── rag.py
+│   ├── prompts.py        # LLM prompt templates (tune here)
+│   └── preprocessing.py  # Input normalization and length limits
+├── tests/                # Pytest: preprocessing, RAG, LLM, API
 ├── frontend/             # Next.js app
 │   ├── app/              # App Router (layout, page, globals.css)
 │   ├── components/       # Header, PatientContext, PrescriptionForm, Results, EvidenceCard, InitKB
@@ -120,6 +125,19 @@ PrescribeMe/
 │   └── package.json
 └── chroma_db/            # Created at runtime (Chroma persistence)
 ```
+
+---
+
+## Testing
+
+From the project root:
+
+```bash
+pip install -r requirements.txt
+python -m pytest tests/ -v
+```
+
+Tests cover input preprocessing, RAG flow (with mocked LLM), response parsing, API validation, and cache behavior. Backend tests do not require a live OpenAI or Chroma instance except where noted.
 
 ---
 

@@ -2,14 +2,20 @@
 PrescribeMe FastAPI backend — used by the Next.js frontend.
 Run from project root: uvicorn api.main:app --reload --port 8000
 """
+import hashlib
 import os
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from config import CHROMA_COLLECTION_NAME
-from src.chroma_store import build_and_populate_store, get_chroma_client
+from config import (
+    CHROMA_COLLECTION_NAME,
+    MAX_PATIENT_CONTEXT_LENGTH,
+    MAX_PRESCRIPTION_LENGTH,
+)
+from src.chroma_store import build_knowledge_base, get_chroma_client
 from src.rag import run_analysis
 
 app = FastAPI(
@@ -31,10 +37,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Optional in-memory cache for analyze (avoids duplicate LLM calls). Disable with ENABLE_ANALYZE_CACHE=0.
+_enable_cache = os.getenv("ENABLE_ANALYZE_CACHE", "1").strip().lower() in ("1", "true", "yes")
+_analyze_cache: dict[str, dict[str, Any]] = {}
+_CACHE_MAX_ENTRIES = int(os.getenv("ANALYZE_CACHE_MAX_ENTRIES", "100"))
+
+
+def _cache_key(prescription: str, patient_context: str) -> str:
+    return hashlib.sha256((prescription.strip() + "\0" + (patient_context or "").strip()).encode()).hexdigest()
+
 
 class AnalyzeRequest(BaseModel):
-    prescription_text: str
-    patient_context: str = ""
+    prescription_text: str = Field(..., min_length=1, max_length=MAX_PRESCRIPTION_LENGTH + 500)
+    patient_context: str = Field(default="", max_length=MAX_PATIENT_CONTEXT_LENGTH + 500)
 
 
 class InitKBResponse(BaseModel):
@@ -45,31 +60,42 @@ class InitKBResponse(BaseModel):
 
 @app.post("/api/analyze")
 def analyze(request: AnalyzeRequest):
-    """Run RAG analysis on prescription text with optional patient context."""
+    """Run RAG analysis on prescription text with optional patient context.
+    Validates input length; optionally returns cached result for identical request.
+    """
+    prescription = (request.prescription_text or "").strip()
+    patient_context = (request.patient_context or "").strip()
+    if not prescription:
+        raise HTTPException(status_code=400, detail="prescription_text is required and cannot be empty.")
+
+    key = _cache_key(prescription, patient_context)
+    if _enable_cache and key in _analyze_cache:
+        return _analyze_cache[key]
+    if _enable_cache:
+        while len(_analyze_cache) >= _CACHE_MAX_ENTRIES:
+            _analyze_cache.pop(next(iter(_analyze_cache)))
+
     result = run_analysis(
-        prescription_text=request.prescription_text,
-        patient_context=request.patient_context,
+        prescription_text=prescription,
+        patient_context=patient_context,
     )
     if result["error"]:
         raise HTTPException(status_code=500, detail=result["error"])
-    return {
+
+    out = {
         "assessment": result["assessment"],
         "retrieved": result["retrieved"],
     }
+    if _enable_cache:
+        _analyze_cache[key] = out
+    return out
 
 
 @app.post("/api/init-kb")
 def init_knowledge_base():
-    """Initialize Chroma with sample drug interaction data. Idempotent."""
+    """Initialize Chroma from sample + DrugBank + PubMed data. Replaces existing KB."""
     try:
-        client = get_chroma_client()
-        coll = client.get_or_create_collection(
-            name=CHROMA_COLLECTION_NAME,
-            metadata={"description": "PrescribeMe drug interaction evidence"},
-        )
-        if coll.count() > 0:
-            return InitKBResponse(ok=True, message="Knowledge base already populated.", count=coll.count())
-        count = build_and_populate_store()
+        count = build_knowledge_base(clear_first=True)
         return InitKBResponse(ok=True, message="Knowledge base ready.", count=count)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

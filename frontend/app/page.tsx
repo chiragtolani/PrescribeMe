@@ -70,10 +70,20 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800"
+                className="mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800"
               >
                 <AlertCircle className="h-5 w-5 shrink-0" />
-                <p className="text-sm">{error}</p>
+                <p className="min-w-0 flex-1 text-sm">{error}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setError(null);
+                    setResult(null);
+                  }}
+                  className="shrink-0 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 transition hover:bg-red-100"
+                >
+                  Dismiss
+                </button>
               </motion.div>
             )}
 

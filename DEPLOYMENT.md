@@ -53,6 +53,13 @@ The Next.js app calls a **FastAPI** backend. Host it on Render so you have a sta
    - **`CORS_ORIGINS`** = your Vercel frontend URL, e.g.  
      `https://prescribeme-xxxx.vercel.app`  
      (So the browser can call the API from your Vercel app. Add multiple URLs comma-separated if needed.)
+   - **Chroma (choose one):**
+     - **Option A — Chroma Cloud** (recommended for production):
+       - **`CHROMA_API_KEY`** = your Chroma Cloud API key
+       - **`CHROMA_TENANT`** = your tenant UUID (e.g. from chroma.cloud dashboard)
+       - **`CHROMA_DATABASE`** = database name (e.g. `drugs-database`)
+     - **Option B — Local Chroma** (ephemeral, data lost on restart):
+       - Leave `CHROMA_TENANT` unset (uses local PersistentClient; data wiped on Render restarts)
 
 6. **Create Web Service.**  
    Render will build and deploy. Your API URL will be like:  
@@ -88,4 +95,6 @@ If you prefer a single config file, you can use the **Blueprint** in this repo:
 
 After deployment, open your Vercel URL, click **Initialize knowledge base** once, then use **Analyze prescription** as usual.
 
-**Note:** On Render’s free tier, the API may sleep after inactivity; the first request after sleep can be slow. Chroma data is not persistent across restarts—re-run “Initialize knowledge base” if the API was restarted.
+**Note:** On Render’s free tier, the API may sleep after inactivity; the first request after sleep can be slow.
+
+**Chroma persistence:** If using **local Chroma** (no `CHROMA_HOST`), data is stored in `./chroma_db` but **wiped on Render restarts**. Re-run “Initialize knowledge base” after each restart. For production, use **Chroma Cloud** (`CHROMA_HOST` + `CHROMA_API_KEY`) for persistent storage.
