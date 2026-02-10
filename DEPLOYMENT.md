@@ -121,6 +121,6 @@ has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is pres
 
 To confirm what the API allows:
 - **Render → your service → Logs**: on startup you should see `CORS allowed origins: [...]`.
-- **From the browser**: open `https://prescribeme-api.onrender.com/api/cors-check` and check the JSON; your Vercel URL should be in `allowed_origins`.
+- **From the browser**: open `https://prescribeme-api.onrender.com/api/health` and check the JSON; your Vercel URL should be in `cors_allowed_origins`.
 
 **If CORS_ORIGINS is correct but you still see CORS errors:** On Render’s free tier the service can sleep. The *first* request after wake-up may be answered by Render’s “starting” page, which has no CORS headers. **Fix:** Wait 30–60 seconds, open `https://prescribeme-api.onrender.com/api/health` in a new tab until it returns `{"status":"ok"}`, then try the frontend again (e.g. Initialize knowledge base).

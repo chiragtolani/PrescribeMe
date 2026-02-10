@@ -114,11 +114,6 @@ def init_knowledge_base():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok"}
-
-
-@app.get("/api/cors-check")
-def cors_check():
-    """Return allowed CORS origins (for debugging). Safe to call from browser."""
+    """Health check. Includes allowed CORS origins for debugging."""
     normalized = list(dict.fromkeys(o.rstrip("/") for o in allow_origins))
-    return {"allowed_origins": normalized}
+    return {"status": "ok", "cors_allowed_origins": normalized}
