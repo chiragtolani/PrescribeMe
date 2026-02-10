@@ -50,9 +50,9 @@ The Next.js app calls a **FastAPI** backend. Host it on Render so you have a sta
 
 5. **Environment variables** (Environment tab):
    - **`OPENAI_API_KEY`** = your OpenAI API key (required).
-   - **`CORS_ORIGINS`** = your Vercel frontend URL, e.g.  
-     `https://prescribeme-xxxx.vercel.app`  
-     (So the browser can call the API from your Vercel app. Add multiple URLs comma-separated if needed.)
+   - **`CORS_ORIGINS`** = your **exact** Vercel frontend URL, e.g.  
+     `https://prescribe-me.vercel.app`  
+     (Must match the browser origin exactly: same scheme, host, no trailing slash. Comma-separated for multiple.)
    - **Chroma (choose one):**
      - **Option A — Chroma Cloud** (recommended for production):
        - **`CHROMA_API_KEY`** = your Chroma Cloud API key
@@ -98,3 +98,29 @@ After deployment, open your Vercel URL, click **Initialize knowledge base** once
 **Note:** On Render’s free tier, the API may sleep after inactivity; the first request after sleep can be slow.
 
 **Chroma persistence:** If using **local Chroma** (no `CHROMA_HOST`), data is stored in `./chroma_db` but **wiped on Render restarts**. Re-run “Initialize knowledge base” after each restart. For production, use **Chroma Cloud** (`CHROMA_HOST` + `CHROMA_API_KEY`) for persistent storage.
+
+---
+
+## Troubleshooting: CORS blocked
+
+If the browser shows:
+
+```
+Access to fetch at 'https://prescribeme-api.onrender.com/...' from origin 'https://prescribe-me.vercel.app'
+has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present
+```
+
+**Fix:** The API must allow your frontend origin. On **Render**:
+
+1. Open your **prescribeme-api** service → **Environment**.
+2. Add or edit **`CORS_ORIGINS`** and set it to your **exact** Vercel URL:
+   - `https://prescribe-me.vercel.app` (no trailing slash)
+   - If you use a custom domain, use that (e.g. `https://prescribeme.yourdomain.com`).
+3. Save. Render will redeploy the service.
+4. After deploy, try again from the frontend.
+
+To confirm what the API allows:
+- **Render → your service → Logs**: on startup you should see `CORS allowed origins: [...]`.
+- **From the browser**: open `https://prescribeme-api.onrender.com/api/cors-check` and check the JSON; your Vercel URL should be in `allowed_origins`.
+
+**If CORS_ORIGINS is correct but you still see CORS errors:** On Render’s free tier the service can sleep. The *first* request after wake-up may be answered by Render’s “starting” page, which has no CORS headers. **Fix:** Wait 30–60 seconds, open `https://prescribeme-api.onrender.com/api/health` in a new tab until it returns `{"status":"ok"}`, then try the frontend again (e.g. Initialize knowledge base).

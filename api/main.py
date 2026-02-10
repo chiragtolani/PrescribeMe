@@ -24,10 +24,14 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# CORS: allow Vercel frontend and localhost. Set CORS_ORIGINS in production (comma-separated).
+# CORS: allow frontend origin. In production (e.g. Render) set CORS_ORIGINS to your Vercel URL.
+# Example: CORS_ORIGINS=https://prescribe-me.vercel.app (comma-separated for multiple)
 _default_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
 _cors_origins = os.getenv("CORS_ORIGINS", "").strip()
-allow_origins = [o.strip() for o in _cors_origins.split(",") if o.strip()] or _default_origins
+_origins_list = [o.strip().rstrip("/") for o in _cors_origins.split(",") if o.strip()]
+# Include both with and without trailing slash so browser Origin always matches
+allow_origins = _origins_list or _default_origins
+allow_origins = list(dict.fromkeys(allow_origins + [o + "/" for o in allow_origins]))
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,7 +39,14 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+
+@app.on_event("startup")
+def _log_cors():
+    import sys
+    print("CORS allowed origins:", allow_origins, file=sys.stderr)
 
 # Optional in-memory cache for analyze (avoids duplicate LLM calls). Disable with ENABLE_ANALYZE_CACHE=0.
 _enable_cache = os.getenv("ENABLE_ANALYZE_CACHE", "1").strip().lower() in ("1", "true", "yes")
@@ -104,3 +115,10 @@ def init_knowledge_base():
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/api/cors-check")
+def cors_check():
+    """Return allowed CORS origins (for debugging). Safe to call from browser."""
+    normalized = list(dict.fromkeys(o.rstrip("/") for o in allow_origins))
+    return {"allowed_origins": normalized}
