@@ -124,3 +124,7 @@ To confirm what the API allows:
 - **From the browser**: open `https://prescribeme-api.onrender.com/api/health` and check the JSON; your Vercel URL should be in `cors_allowed_origins`.
 
 **If CORS_ORIGINS is correct but you still see CORS errors:** On Render’s free tier the service can sleep. The *first* request after wake-up may be answered by Render’s “starting” page, which has no CORS headers. **Fix:** Wait 30–60 seconds, open `https://prescribeme-api.onrender.com/api/health` in a new tab until it returns `{"status":"ok"}`, then try the frontend again (e.g. Initialize knowledge base).
+
+**404 on Initialize KB (and CORS error):** A 404 with no CORS header usually means the response did not come from the FastAPI app. Check:
+- **Vercel env** `NEXT_PUBLIC_API_URL` = `https://prescribeme-api.onrender.com` with **no trailing slash** and **no** `/api` suffix (the app adds `/api/init-kb` itself).
+- **Render request timeout:** Init KB can take many minutes with a large KB (e.g. 300k+ DrugBank interactions). Render’s free tier may close the request after 30–60 seconds. If it times out, the connection drops and the browser can show 404 + CORS. **Workaround:** Run the KB build from your machine: `python -m scripts.build_kb` (with `OPENAI_API_KEY` and Chroma env set), then deploy; or use a smaller dataset for the UI “Initialize KB” and use the full KB only when built via CLI.

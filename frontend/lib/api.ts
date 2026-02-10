@@ -1,7 +1,11 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+/** Base URL for the API (no trailing slash). */
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/+$/, "");
 
 /** Request timeout in ms (backend may take 30–90s for retrieval + LLM). */
 const ANALYZE_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_ANALYZE_TIMEOUT_MS) || 90000;
+
+/** Init KB can take several minutes with a large dataset (embedding + Chroma upsert). */
+const INIT_KB_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_INIT_KB_TIMEOUT_MS) || 300000;
 
 export type RetrievedChunk = {
   id: string;
@@ -79,12 +83,34 @@ export async function analyzePrescription(
 }
 
 export async function initKnowledgeBase(): Promise<InitKBResponse> {
-  const res = await fetch(`${API_BASE}/api/init-kb`, { method: "POST" });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || "Init failed");
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), INIT_KB_TIMEOUT_MS);
+  try {
+    const res = await fetch(`${API_BASE}/api/init-kb`, {
+      method: "POST",
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      if (res.status === 404) {
+        throw new Error(
+          "Init KB endpoint not found (404). Check NEXT_PUBLIC_API_URL and that the backend is deployed."
+        );
+      }
+      throw new Error(err.detail || "Init failed");
+    }
+    return res.json();
+  } catch (e) {
+    clearTimeout(timeoutId);
+    if (e instanceof Error) {
+      if (e.name === "AbortError") {
+        throw new Error("Initialize KB timed out. For large datasets, run from CLI: python -m scripts.build_kb");
+      }
+      throw e;
+    }
+    throw new Error("Init failed");
   }
-  return res.json();
 }
 
 export async function healthCheck(): Promise<{ status: string }> {

@@ -4,11 +4,13 @@ Run from project root: uvicorn api.main:app --reload --port 8000
 """
 import hashlib
 import os
-from typing import Any
+from typing import Any, Callable
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from config import (
     CHROMA_COLLECTION_NAME,
@@ -41,6 +43,21 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
+
+class EnsureCORSHeadersMiddleware(BaseHTTPMiddleware):
+    """Ensure CORS headers are on every response (e.g. 404 from our app)."""
+
+    async def dispatch(self, request: Request, call_next: Callable):
+        response = await call_next(request)
+        origin = request.headers.get("origin")
+        if origin and origin in allow_origins:
+            response.headers.setdefault("access-control-allow-origin", origin)
+            response.headers.setdefault("access-control-allow-credentials", "true")
+        return response
+
+
+app.add_middleware(EnsureCORSHeadersMiddleware)
 
 
 @app.on_event("startup")
