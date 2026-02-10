@@ -15,7 +15,7 @@ So: add or update files here, then run the KB build to push the latest data into
 | File | Required | Description |
 |------|----------|-------------|
 | `sample_interactions.json` | Yes (shipped) | Curated sample drug–drug interactions. |
-| `drugbank_interactions.json` | Optional | DrugBank-style interactions. Create via `scripts.ingest_drugbank` (see below). |
+| `drugbank_interactions.json` | Optional | DrugBank-style interactions. Create via `scripts.ingest_drugbank` (see below). **Not in repo** (large; gitignored)—generate locally. |
 | `pubmed_abstracts.json` | Optional | PubMed abstracts. Create via `scripts.fetch_pubmed` or manually. |
 
 After adding or changing any file, run **Initialize knowledge base** in the app or `python -m scripts.build_kb` to **re-import into Chroma** (existing collection is replaced).

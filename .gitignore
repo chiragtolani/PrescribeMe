@@ -9,11 +9,6 @@ frontend/.env.local
 # Chroma
 chroma_db/
 
-# DrugBank (large; generate locally via scripts/ingest_drugbank)
-drugbank.xml
-drugbank_*.xml
-data/drugbank_interactions.json
-
 # Python
 __pycache__/
 *.py[cod]
