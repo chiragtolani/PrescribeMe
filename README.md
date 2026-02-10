@@ -37,8 +37,10 @@ PrescribeMe is an intelligent AI-driven prescription review system designed to i
 
 1. **Clone and enter the project**
    ```bash
+   git clone <repo-url> PrescribeMe
    cd PrescribeMe
    ```
+   **Large files (DrugBank):** This repo uses [Git LFS](https://git-lfs.github.com/) for `drugbank.xml` and `data/drugbank_interactions.json`. After cloning, run `git lfs pull` (or ensure Git LFS is installed and fetch will pull LFS files automatically).
 
 2. **Create a virtual environment (recommended)**
    ```bash
